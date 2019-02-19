@@ -1,0 +1,175 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h3 class="float-left"><strong>Cadastro de Pessoa</strong></h3><br>
+    </div>
+  </div>
+
+  <form class="form" [formGroup]="pessoaForm" autocomplete="off">
+    <div class="row">
+      <div class="col-md-8">
+        <mat-form-field class="full-width">
+          <input matInput placeholder="Nome" [formControl]="nomeFormControl"
+                 [(ngModel)]="pessoa.Nome" required>
+          <mat-error *ngIf="nomeFormControl.invalid">{{getRequiredErrorMessage('nome')}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="col-md-4">
+        <mat-form-field class="full-width">
+          <input matInput placeholder="CPF" [formControl]="cpfFormControl"
+                 [(ngModel)]="pessoa.CPF" type="tel" [maxlength]="11" required>
+          <mat-error *ngIf="cpfFormControl.invalid">{{getCpfCnpjErrorMessage()}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4">
+        <mat-form-field class="full-width" hintLabel="Selecione o sexo">
+          <mat-select placeholder="Sexo" [(ngModel)]="pessoa.Sexo"
+                      [formControl]="sexoFormControl" required>
+            <mat-option value="M">Masculino</mat-option>
+            <mat-option value="F">Feminino</mat-option>
+          </mat-select>
+          <mat-error *ngIf="sexoFormControl.invalid">{{getRequiredErrorMessage('sexo')}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="col-md-4">
+        <label>Grupos: </label>&nbsp;<br>
+        <mat-radio-group [formControl]="grupoFormControl" [(ngModel)]="pessoa.Grupo">
+          <mat-radio-button [value]="1">Grupo 1</mat-radio-button>&nbsp;
+          <mat-radio-button [value]="2">Grupo 2</mat-radio-button>
+        </mat-radio-group>
+      </div>
+      <div class="col-md-4">
+        <label>Situação: </label>&nbsp;<br>
+        <mat-radio-group [disabled]="!codigoPessoa" [formControl]="situacaoFormControl"
+                         [(ngModel)]="pessoa.Situacao">
+          <mat-radio-button [value]="true">Ativo</mat-radio-button>&nbsp;
+          <mat-radio-button [value]="false">Inativo</mat-radio-button>
+        </mat-radio-group>
+      </div>
+    </div>
+  </form>
+  <br>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-10">
+        <form class="form" [formGroup]="dependenteForm" autocomplete="off">
+          <div class="row">
+            <div class="col-md-9">
+              <mat-form-field class="full-width">
+                <input matInput placeholder="Nome" [formControl]="nomeDependenteFormControl"
+                       [(ngModel)]="dependente.Nome" required>
+                <mat-error
+                  *ngIf="nomeDependenteFormControl.invalid">{{getRequiredErrorMessageDependente('nomeDependente')}}
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-md-3">
+              <mat-form-field class="full-width" hintLabel="Selecione a data de nascimento">
+                <input matInput [matDatepicker]="picker" [(ngModel)]="datNascimento"
+                       placeholder="Data de nascimento" [formControl]="dataNascimentoDependenteFormControl" required>
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker touchUi #picker></mat-datepicker>
+                <mat-error *ngIf="dataNascimentoDependenteFormControl.invalid">
+                  {{getRequiredErrorMessageDependente('dataNascimentoDependente')}}
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-2">
+        <button mat-raised-button color="primary" (click)="incluirDependente()" [disabled]="!(dependenteForm.valid)">
+          Incluir
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="mat-elevation-z8">
+        <div class="responsive_table">
+          <table [dataSource]="dataSource" mat-table matSort>
+
+            <!-- Código Column -->
+            <ng-container matColumnDef="Codigo">
+              <th *matHeaderCellDef [style.max-width]="'10px'" mat-header-cell mat-sort-header> Código</th>
+              <td *matCellDef="let row" [style.max-width]="'10px'" mat-cell>{{row.Codigo_dependente}}
+              </td>
+            </ng-container>
+
+            <!-- Nome Column -->
+            <ng-container matColumnDef="Nome">
+              <th *matHeaderCellDef [style.max-width]="'50px'" mat-header-cell mat-sort-header> Nome</th>
+              <td *matCellDef="let row" [style.max-width]="'50px'" mat-cell>{{row.Nome}}
+              </td>
+            </ng-container>
+
+            <!-- DataNascimento Column -->
+            <ng-container matColumnDef="DataNascimento">
+              <th *matHeaderCellDef [style.max-width]="'15px'" mat-header-cell mat-sort-header> Data Nascimento</th>
+              <td *matCellDef="let row" [style.max-width]="'15px'" mat-cell>{{row.Data_nascimento | date:"dd/MM/yyyy"}}
+              </td>
+            </ng-container>
+
+            <!-- Idade Column -->
+            <ng-container matColumnDef="Idade">
+              <th *matHeaderCellDef [style.max-width]="'10px'" mat-header-cell mat-sort-header> Idade</th>
+              <td *matCellDef="let row" [style.max-width]="'10px'" mat-cell>{{processaIdade(row.Data_nascimento)}}
+              </td>
+            </ng-container>
+
+            <!-- Ações -->
+            <ng-container matColumnDef="Acoes">
+              <th *matHeaderCellDef [style.max-width]="'20px'" mat-header-cell mat-sort-header> Ações</th>
+              <td *matCellDef="let row" [style.max-width]="'20px'" mat-cell>
+                <button color="primary" mat-raised-button (click)="editarDependente(row)"
+                        matTooltip="Editar cadastro" matTooltipClass="example-tooltip-red">
+                  Editar
+                </button>&nbsp;&nbsp;
+                <button color="warn" mat-raised-button (click)="excluirDependente(row)"
+                        matTooltip="Excluir cadastro" matTooltipClass="example-tooltip-red">
+                  Excluir
+                </button>
+              </td>
+            </ng-container>
+
+            <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+            <tr *matRowDef="let row; columns: displayedColumns;" mat-row>
+            </tr>
+          </table>
+        </div>
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [pageSize]="25"></mat-paginator>
+      </div>
+    </div>
+  </div><br>
+
+  <div class="row">
+    <div class="col-md-12">
+      <mat-form-field class="full-width" hintLabel="Digite uma observação">
+                            <textarea matInput placeholder="Observação" [(ngModel)]="pessoa.Observacao"
+                                      [formControl]="observacaoFormControl"
+                                      cdkTextareaAutosize [(ngModel)]="observacao"
+                                      #autosize="cdkTextareaAutosize"
+                                      cdkAutosizeMinRows="3" cdkAutosizeMaxRows="10">
+                            </textarea>
+        <mat-error *ngIf="observacaoFormControl.invalid">{{getRequiredErrorMessage('observacao')}}
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </div>
+  <br>
+
+  <div>
+    <button mat-raised-button color="primary" (click)="confirmar()" [disabled]="!pessoaForm.valid">Salvar
+    </button>&nbsp;&nbsp;
+    <button mat-raised-button color="primary" routerLink="/pessoas/listagem">Cancelar</button>
+  </div>
+</div>
+<br>

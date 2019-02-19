@@ -1,0 +1,73 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h3 class="float-left"><strong>Lista de Pessoas</strong></h3><br>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-8">
+      <mat-form-field>
+        <input autocomplete="off" [(ngModel)]="searchText" matInput placeholder="Pesquisar pessoas...">
+      </mat-form-field>
+    </div>
+    <div class="col-md-2">
+      <button class="float-right" color="primary" (click)="applyFilter()" mat-raised-button>
+        Pesquisar&nbsp;&nbsp;
+        <mat-icon>search</mat-icon>
+      </button>
+    </div>
+    <div class="col-md-2">
+      <button class="float-right" color="primary" (click)="cadastrarPessoa()" mat-raised-button>
+        Incluir Pessoa&nbsp;&nbsp;
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="mat-elevation-z8">
+        <div class="responsive_table">
+          <table [dataSource]="dataSource" mat-table matSort>
+
+            <!-- Nome Column -->
+            <ng-container matColumnDef="Nome">
+              <th *matHeaderCellDef [style.max-width]="'70px'" mat-header-cell mat-sort-header> Nome</th>
+              <td *matCellDef="let row" [style.max-width]="'70px'"
+                  [style.background-color]="!row.Situacao ? 'lightcoral' : 'white'" mat-cell>{{row.Nome}}
+              </td>
+            </ng-container>
+
+            <!-- CPF Column -->
+            <ng-container matColumnDef="CPF">
+              <th *matHeaderCellDef [style.max-width]="'15px'" mat-header-cell mat-sort-header> CPF</th>
+              <td *matCellDef="let row" [style.max-width]="'15px'"
+                  [style.background-color]="!row.Situacao ? 'lightcoral' : 'white'" mat-cell>{{row.CPF}}
+              </td>
+            </ng-container>
+
+            <!-- Ações -->
+            <ng-container matColumnDef="Acoes">
+              <th *matHeaderCellDef [style.max-width]="'15px'" mat-header-cell mat-sort-header> Ações</th>
+              <td *matCellDef="let row" [style.max-width]="'15px'"
+                  [style.background-color]="!row.Situacao ? 'lightcoral' : 'white'" mat-cell>
+                <button color="primary" mat-raised-button (click)="atualizar(row)"
+                        matTooltip="Editar cadastro" matTooltipClass="example-tooltip-red">
+                  Editar
+                </button>&nbsp;&nbsp;
+                <button color="warn" mat-raised-button (click)="excluir(row)"
+                        matTooltip="Excluir cadastro" matTooltipClass="example-tooltip-red">
+                  Excluir
+                </button>
+              </td>
+            </ng-container>
+
+            <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+            <tr *matRowDef="let row; columns: displayedColumns;" mat-row>
+            </tr>
+          </table>
+        </div>
+        <mat-paginator [length]="resultsLength" [pageSize]="10" (page)="getNext($event)"></mat-paginator>
+      </div>
+    </div>
+  </div>
+</div>
